@@ -303,6 +303,51 @@
     75%{ transform:translateX(2px); }
   }
 
+  .spell-switch-row{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:10px 0 18px; }
+  .spell-switch-btn{
+    padding:10px 16px; border-radius:999px; border:none; background:#F1F3F6; color:var(--ink);
+    font-weight:bold; font-size:13px; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.08); transition:transform .1s;
+  }
+  .spell-switch-btn:active{ transform:scale(0.96); }
+  .spell-switch-btn.active{ background:linear-gradient(90deg,#4D96FF,#7C6FE8); color:white; }
+  .spell-panel.hidden{ display:none; }
+  .spell-story-box{ background:#F7F9FC; border-radius:14px; padding:16px 18px; font-size:15.5px; line-height:1.9; }
+  .spell-word-btn{
+    font:inherit; border:none; background:none; cursor:pointer; color:inherit;
+    padding:1px 4px; border-radius:6px; border-bottom:3px solid transparent;
+  }
+  .spell-word-btn.found{ background:#FFF3D6; border-bottom:3px solid var(--c4); font-weight:bold; }
+  .spell-tally{ margin-top:12px; font-weight:bold; color:var(--tab); text-align:center; font-size:13.5px; }
+  .spell-fixlist{ list-style:none; margin:14px 0 0; padding:0; }
+  .spell-fixlist li{ display:grid; grid-template-columns:24px 1fr auto; gap:8px; align-items:center; padding:7px 0; border-bottom:1px dashed #E4E8EE; }
+  .spell-fixlist .num{ color:#B3AA8F; font-weight:bold; font-size:13px; }
+  .spell-fixlist input{ font:inherit; padding:9px 10px; border-radius:10px; border:1.5px solid #DCE6FF; width:100%; font-size:13.5px; }
+  .spell-fixlist input:focus{ outline:none; border-color:var(--tab); }
+  .spell-fixlist input.is-correct{ border-color:var(--good); background:#E9FBEF; }
+  .spell-fixlist input.is-incorrect{ border-color:var(--bad); background:#FFEDEC; }
+  .spell-fixlist input:disabled{ opacity:1; color:inherit; }
+  .spell-fixlist .status{ width:22px; text-align:center; font-size:17px; }
+  .spell-fixlist .status.tick{ color:var(--good); }
+  .spell-fixlist .status.cross{ color:var(--bad); }
+  .spell-sentence-item{ margin-bottom:14px; }
+  .spell-sentence-item label{ display:block; font-weight:bold; margin-bottom:6px; color:var(--tab); font-size:13.5px; }
+  .spell-sentence-item textarea{
+    width:100%; font:inherit; padding:10px 12px; border-radius:10px; border:1.5px solid #DCE6FF;
+    resize:vertical; min-height:44px; font-size:13.5px;
+  }
+  .spell-sentence-item textarea:focus{ outline:none; border-color:var(--tab); }
+  .spell-match-wrap{ display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; }
+  .spell-match-label{ font-size:12px; color:var(--soft); font-weight:bold; margin-bottom:8px; }
+  .spell-match-btn{
+    display:block; width:100%; font:inherit; font-weight:bold; text-align:left;
+    padding:10px 12px; margin-bottom:8px; border-radius:10px; border:1.5px solid #DCE6FF;
+    background:#F7F9FC; cursor:pointer; color:var(--ink); font-size:13px;
+  }
+  .spell-match-btn.selected{ border-color:var(--c4); background:#FFF3D6; }
+  .spell-match-btn.matched{ background:#E9FBEF; border-color:var(--good); color:var(--good); cursor:default; }
+  .spell-match-btn.shake{ animation:matchshake .32s; border-color:var(--bad); background:#FFEDEC; }
+  @keyframes matchshake{ 25%{ transform:translateX(-5px); } 75%{ transform:translateX(5px); } }
+
   #continue-wrap{text-align:center; margin-top:22px;}
   #continue-btn{
     background:linear-gradient(90deg,#3FBF7F,#4D96FF); color:white; border:none; padding:14px 34px; font-size:16px;
@@ -400,6 +445,19 @@
     <div class="stage-badge" style="margin-top:22px;">Is This Bullying? 🤔</div>
     <p style="text-align:center; margin:6px 0 14px; color:var(--soft); font-size:13.5px;">Tap a card to see the right answer.</p>
     <div class="flip-grid" id="bully-check-grid"></div>
+  </div>
+
+  <!-- 5b. BUS SAFETY SOCIAL STORY -->
+  <div class="card session-step hidden" id="bus-safety">
+    <div class="stage-badge">🚌 Staying Safe on the Bus</div>
+    <p style="color:var(--soft); font-size:13px; margin:6px 0 10px;">Read the story below, then flip the cards to learn more.</p>
+    <div id="bus-story-list"></div>
+    <div class="stage-badge" style="margin-top:22px;">What Should I Do? 🤔</div>
+    <p style="text-align:center; margin:6px 0 14px; color:var(--soft); font-size:13.5px;">Tap a card to flip it and reveal the answer.</p>
+    <div class="flip-grid" id="bus-grid"></div>
+    <div class="stage-badge" style="margin-top:22px;">Bus Safe or Not Safe? 🚦</div>
+    <p style="text-align:center; margin:6px 0 14px; color:var(--soft); font-size:13.5px;">Tap a card to see the right answer.</p>
+    <div class="flip-grid" id="bus-check-grid"></div>
   </div>
 
   <!-- 6. SORT IT -->
@@ -523,6 +581,64 @@
     </div>
   </div>
 
+  <!-- 17. SPELLING MISTAKES -->
+  <div class="card session-step hidden" id="spelling">
+    <div class="stage-badge">🔤 Spot the Spelling Mistakes</div>
+    <p style="text-align:center; margin:4px 0 10px; color:var(--soft); font-size:13.5px;">Find the misspelled words, then fix them. Any order is fine — what matters is getting each spelling right.</p>
+    <div class="spell-switch-row" id="spell-switch"></div>
+
+    <div id="spell-panel-0" class="spell-panel">
+      <div class="stage-badge">1️⃣ Find and Tap — Sam's Day at the Beach</div>
+      <p style="color:var(--soft); font-size:13px; margin:6px 0 10px;">Tap every word that is spelled wrong.</p>
+      <div class="spell-story-box" id="spell-story-0"></div>
+      <div class="spell-tally" id="spell-tally-0"></div>
+
+      <div class="stage-badge" style="margin-top:20px;">2️⃣ Fix the Words</div>
+      <p style="color:var(--soft); font-size:13px; margin:6px 0 10px;">Type the correct spelling for each word below — any order is fine!</p>
+      <ul class="spell-fixlist" id="spell-fixlist-0"></ul>
+      <div class="center"><button class="primary" id="spell-check-0">Check My Spelling</button></div>
+      <div class="msg" id="spell-result-0"></div>
+
+      <div class="stage-badge" style="margin-top:20px;">3️⃣ Use It in a Sentence</div>
+      <p style="color:var(--soft); font-size:13px; margin:6px 0 10px;">Pick 5 fixed words and write a new sentence for each.</p>
+      <div id="spell-sentences"></div>
+
+      <div class="stage-badge" style="margin-top:20px;">4️⃣ Match the Pairs</div>
+      <p style="color:var(--soft); font-size:13px; margin:6px 0 10px;">Tap a misspelled word, then tap its correct spelling.</p>
+      <div class="spell-match-wrap">
+        <div><div class="spell-match-label">MISSPELLED</div><div id="spell-match-left"></div></div>
+        <div><div class="spell-match-label">CORRECT</div><div id="spell-match-right"></div></div>
+      </div>
+      <div class="msg" id="spell-match-result"></div>
+    </div>
+
+    <div id="spell-panel-1" class="spell-panel hidden">
+      <div class="stage-badge">1️⃣ Find and Tap — A Trip to the Park</div>
+      <p style="color:var(--soft); font-size:13px; margin:6px 0 10px;">Tap every word that is spelled wrong.</p>
+      <div class="spell-story-box" id="spell-story-1"></div>
+      <div class="spell-tally" id="spell-tally-1"></div>
+
+      <div class="stage-badge" style="margin-top:20px;">2️⃣ Fix the Words</div>
+      <p style="color:var(--soft); font-size:13px; margin:6px 0 10px;">Type the correct spelling for each word below — any order is fine!</p>
+      <ul class="spell-fixlist" id="spell-fixlist-1"></ul>
+      <div class="center"><button class="primary" id="spell-check-1">Check My Spelling</button></div>
+      <div class="msg" id="spell-result-1"></div>
+    </div>
+
+    <div id="spell-panel-2" class="spell-panel hidden">
+      <div class="stage-badge">1️⃣ Find and Tap — Helping in the Kitchen</div>
+      <p style="color:var(--soft); font-size:13px; margin:6px 0 10px;">Tap every word that is spelled wrong.</p>
+      <div class="spell-story-box" id="spell-story-2"></div>
+      <div class="spell-tally" id="spell-tally-2"></div>
+
+      <div class="stage-badge" style="margin-top:20px;">2️⃣ Fix the Words</div>
+      <p style="color:var(--soft); font-size:13px; margin:6px 0 10px;">Type the correct spelling for each word below — any order is fine!</p>
+      <ul class="spell-fixlist" id="spell-fixlist-2"></ul>
+      <div class="center"><button class="primary" id="spell-check-2">Check My Spelling</button></div>
+      <div class="msg" id="spell-result-2"></div>
+    </div>
+  </div>
+
   <!-- SESSION COMPLETE -->
   <div class="card session-step hidden" id="finished">
     <div class="stage-badge">🎉 Session Complete</div>
@@ -537,13 +653,14 @@
 
 <script>
 /* ===================== SESSION ENGINE ===================== */
-const SESSION_STEPS = ['colors','numbers','code','social','bullying','sort','match','house','bridge','chair','sentence-builder','spot-it','dots-writing'];
+const SESSION_STEPS = ['colors','numbers','code','social','bullying','bus-safety','sort','match','house','bridge','chair','sentence-builder','spot-it','dots-writing','spelling'];
 const STEP_LABELS = {
   'colors':'🎨 Colour Match',
   'numbers':'🔢 Number Memory',
   'code':'🔤 Code Break',
   'social':'🤝 Social Situations',
   'bullying':'🚫 Anti-Bullying Story',
+  'bus-safety':'🚌 Bus Safety Story',
   'sort':'🧺 Sort It',
   'match':'🃏 Memory Match',
   'house':'🏠 Build a House',
@@ -552,6 +669,7 @@ const STEP_LABELS = {
   'sentence-builder':'📝 Sentence Builder',
   'spot-it':'🔍 Spot It!',
   'dots-writing':'✏️ Dot-to-Dot Writing',
+  'spelling':'🔤 Spelling Mistakes',
 };
 let sessionIndex = -1;
 
@@ -1129,6 +1247,55 @@ function buildBullyCards(){
 }
 buildBullyCards();
 
+/* ===================== 5b. BUS SAFETY SOCIAL STORY ===================== */
+const BUS_STORY = [
+  { emoji:'🚌', text:'Adhrit rides the bus to school and other places, along with other kids.' },
+  { emoji:'🔒', text:'When the bus is moving, I sit in my seat and keep my seat belt buckled — it gives my body a safe hug until the bus completely stops.' },
+  { emoji:'🤲', text:'If I feel wiggly, I can squeeze a fidget toy, press my feet into the floor, or squeeze my hands together instead of getting up.' },
+  { emoji:'🤫', text:'The bus driver needs to watch the road, so I use a quiet, inside voice — if I feel excited, I can take deep breaths, look out the window, or listen to music.' },
+  { emoji:'👍', text:'The bus driver and the bus aunty are there to keep me safe. When the bus aunty gives an instruction, I listen and follow it right away.' },
+  { emoji:'🌟', text:'Seat belt on, quiet voice, listening to the bus aunty — that makes me a safe bus rider, and everyone is proud of me!' },
+];
+function buildBusStory(){
+  const list = document.getElementById('bus-story-list'); list.innerHTML='';
+  BUS_STORY.forEach((s,i)=>{
+    const row=document.createElement('div'); row.className='learn-row';
+    row.innerHTML = `<div class="num">${i+1}</div><div class="emo">${s.emoji}</div><div class="txt">${s.text}</div>`;
+    list.appendChild(row);
+  });
+}
+const BUS_CARDS = [
+  { q:'When the bus is moving, I...', a:'Sit in my seat and keep my seat belt buckled until the bus completely stops.' },
+  { q:'If I feel wiggly and want to get up...', a:'I can squeeze a fidget toy, press my feet into the floor, or squeeze my hands together instead.' },
+  { q:'Since the bus driver needs to watch the road, I...', a:'Use a quiet, inside voice — loud noises make it hard for the driver to concentrate.' },
+  { q:'If I feel excited or frustrated on the bus...', a:'I can take deep breaths, look out the window, or listen to music with headphones.' },
+  { q:'When the bus aunty gives an instruction...', a:'I listen and follow it right away — she gives instructions to keep me safe.' },
+];
+const BUS_CHECK_CARDS = [
+  { q:'Adhrit keeps his seat belt on the whole ride until the bus stops. Is this...', optA:'Bus safe', optB:'Not bus safe', a:'A — Bus safe! The seat belt keeps him safe until the bus stops.' },
+  { q:'Adhrit yells loudly while the bus driver is driving. Is this...', optA:'Bus safe', optB:'Not bus safe', a:'B — Not bus safe. Loud noise makes it hard for the driver to concentrate.' },
+  { q:'Adhrit feels wiggly and squeezes his fidget toy instead of standing up. Is this...', optA:'Bus safe', optB:'Not bus safe', a:'A — Bus safe! That\u2019s a great way to handle wiggly feelings while staying seated.' },
+  { q:'The bus aunty says to sit down and Adhrit keeps standing. Is this...', optA:'Bus safe', optB:'Not bus safe', a:'B — Not bus safe. Not listening to the bus aunty means missing an important safety instruction.' },
+  { q:'Adhrit uses a quiet voice and listens to music with headphones when he feels excited. Is this...', optA:'Bus safe', optB:'Not bus safe', a:'A — Bus safe! That\u2019s a good way to stay calm and quiet.' },
+];
+let busFlipped = new Set();
+const BUS_TOTAL = BUS_CARDS.length + BUS_CHECK_CARDS.length;
+function checkBusDone(key){
+  busFlipped.add(key);
+  if(busFlipped.size >= BUS_TOTAL) unlockContinue();
+}
+function buildBusCards(){
+  buildBusStory();
+  const grid = document.getElementById('bus-grid'); grid.innerHTML='';
+  BUS_CARDS.forEach((item,i)=>{ grid.appendChild(makeFlipCard(item.q, item.a, 'u'+i, checkBusDone)); });
+  const cgrid = document.getElementById('bus-check-grid'); cgrid.innerHTML='';
+  BUS_CHECK_CARDS.forEach((item,i)=>{
+    const front = `${item.q}<br><br>A) ${item.optA}<br>B) ${item.optB}`;
+    cgrid.appendChild(makeFlipCard(front, item.a, 'uc'+i, checkBusDone));
+  });
+}
+buildBusCards();
+
 /* ===================== 6. SORT IT ===================== */
 const SORT_ITEMS = [
   { id:'elephant', emoji:'🐘', cat:'big' },
@@ -1703,6 +1870,198 @@ makeDotsWritingGame(
   { badge:'dots-badge', picker:'dots-picker', svg:'dots-svg', msg:'dots-msg', clear:'dots-clear', next:'dots-next' },
   '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 );
+
+/* ===================== 17. SPELLING MISTAKES ===================== */
+const SPELL_STORY1_PARTS = [
+  "Sam woke up ", ["erly","early"], " on ", ["Satday","Saturday"], " morning. He was so ",
+  ["exsited","excited"], " ", ["becuase","because"], " his ", ["familey","family"],
+  " was going to the ", ["beech","beach"], ". Sam ", ["packt","packed"], " his bag with a ",
+  ["towl","towel"], ", some ", ["snaks","snacks"], ", and his ", ["favrite","favorite"], " ",
+  ["yello","yellow"], " ball. \"", ["Dont","Don't"], " forget your hat!\" said his mum. In the car, Sam ",
+  ["lookt","looked"], " out the ", ["windo","window"], " and saw the big ", ["blu","blue"],
+  " sea. When they got ", ["their","there"], ", Sam ran ", ["strait","straight"], " to the water and ",
+  ["jumpt","jumped"], " in the waves. It was a ", ["wunderful","wonderful"], " day."
+];
+const SPELL_STORY2_PARTS = [
+  "Mia and her dad went to the park on a sunny afternoon. She wore a red ",
+  ["jaket","jacket"], " and carried her water ", ["botle","bottle"], ". At the park, Mia met her ",
+  ["frends","friends"], " by the swing. They took ", ["terns","turns"], " on the slide and played tag together. Mia was ",
+  ["verry","very"], " ", ["carefull","careful"], " when she ", ["climed","climbed"], " the ladder. After playing, they sat on a soft ",
+  ["blanet","blanket"], " and had a ", ["snak","snack"], ". When it got dark, they ", ["walkt","walked"],
+  " home for ", ["diner","dinner"], ". Mia was ", ["tird","tired"], " but ", ["happpy","happy"], "."
+];
+const SPELL_STORY3_PARTS = [
+  "On Sunday, Leo ", ["helpt","helped"], " his grandma cook dinner in the kitchen. He ",
+  ["washt","washed"], " his hands ", ["frist","first"], " and put on an apron. Grandma ",
+  ["askt","asked"], " him to ", ["mesure","measure"], " the flour and crack an egg into the bowl. Leo stirred the ",
+  ["mixtur","mixture"], " slowly so it ", ["wouldnt","wouldn't"], " ", ["spil","spill"], ". They ",
+  ["bakt","baked"], " the bread for forty ", ["minits","minutes"], ". The kitchen ", ["smelld","smelled"],
+  " amazing! When it was ", ["redy","ready"], ", Leo was proud of what they made together."
+];
+
+function buildSpellFindActivity(storyElId, tallyElId, parts){
+  const storyEl = document.getElementById(storyElId);
+  const tallyEl = document.getElementById(tallyElId);
+  storyEl.innerHTML=''; 
+  const misspelled = parts.filter(p => Array.isArray(p));
+  const total = misspelled.length;
+  let found = 0;
+  parts.forEach(part=>{
+    if(Array.isArray(part)){
+      const [wrong] = part;
+      const btn = document.createElement('button');
+      btn.className='spell-word-btn'; btn.type='button'; btn.textContent=wrong;
+      btn.addEventListener('click', ()=>{
+        const wasFound = btn.classList.toggle('found');
+        found += wasFound ? 1 : -1;
+        tallyEl.textContent = `Found ${found} of ${total}`;
+      });
+      storyEl.appendChild(btn);
+    } else {
+      storyEl.appendChild(document.createTextNode(part));
+    }
+  });
+  tallyEl.textContent = `Found 0 of ${total}`;
+  return misspelled;
+}
+
+// Order-independent grading: crediting an input only requires that what was typed matches
+// SOME not-yet-claimed correct spelling from this story's word list — the child does not have
+// to recall which blank a particular word "belongs" to, only spell each word correctly.
+function buildSpellFixActivity(listElId, checkBtnId, resultElId, misspelledWords, count, onCheck){
+  const listEl = document.getElementById(listElId);
+  listEl.innerHTML='';
+  const words = misspelledWords.slice(0, count);
+  words.forEach((pair,i)=>{
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <span class="num">${i+1}.</span>
+      <input type="text" aria-label="Answer ${i+1}">
+      <span class="status" data-status></span>
+    `;
+    listEl.appendChild(li);
+  });
+  const inputs = listEl.querySelectorAll('input');
+  const resultEl = document.getElementById(resultElId);
+
+  document.getElementById(checkBtnId).addEventListener('click', ()=>{
+    const pool = words.map(([wrong,correct])=>({ correct: correct.toLowerCase(), claimed:false }));
+    const isCorrect = [];
+    inputs.forEach(input=>{
+      const typed = input.value.trim().toLowerCase();
+      let matched=false;
+      if(typed){
+        const entry = pool.find(p=>!p.claimed && p.correct===typed);
+        if(entry){ entry.claimed=true; matched=true; }
+      }
+      isCorrect.push(matched);
+    });
+    let correctCount=0;
+    inputs.forEach((input,i)=>{
+      const li = input.closest('li');
+      const status = li.querySelector('[data-status]');
+      input.classList.remove('is-correct','is-incorrect');
+      status.classList.remove('tick','cross');
+      if(isCorrect[i]){
+        correctCount++;
+        input.classList.add('is-correct'); input.disabled=true;
+        status.classList.add('tick'); status.textContent='✓';
+      } else {
+        input.classList.add('is-incorrect');
+        status.classList.add('cross'); status.textContent='✕';
+      }
+    });
+    if(correctCount===inputs.length){
+      resultEl.textContent='🎉 All correct — nice work!'; resultEl.className='msg good';
+    } else {
+      const missing = pool.filter(p=>!p.claimed).map(p=>p.correct);
+      resultEl.textContent = `${correctCount} of ${inputs.length} correct. Still need: ${missing.join(', ')}.`;
+      resultEl.className='msg bad';
+    }
+    if(onCheck) onCheck(correctCount, inputs.length);
+  });
+  return words;
+}
+
+function buildSpellSentences(containerId, words){
+  const el = document.getElementById(containerId);
+  el.innerHTML='';
+  words.forEach((word,i)=>{
+    const div=document.createElement('div'); div.className='spell-sentence-item';
+    div.innerHTML = `<label>${i+1}. Write a sentence using "${word}"</label><textarea rows="2"></textarea>`;
+    el.appendChild(div);
+  });
+}
+
+function buildSpellMatch(leftId, rightId, resultId, matchWords){
+  const leftEl=document.getElementById(leftId), rightEl=document.getElementById(rightId), resultEl=document.getElementById(resultId);
+  leftEl.innerHTML=''; rightEl.innerHTML=''; resultEl.textContent=''; resultEl.className='msg';
+  const rightOrder = [...matchWords].sort(()=>Math.random()-0.5);
+  let selectedLeft=null, selectedRight=null, matchedCount=0;
+  function handlePick(btn, side){
+    if(btn.classList.contains('matched')) return;
+    if(side==='left'){ if(selectedLeft) selectedLeft.classList.remove('selected'); selectedLeft=btn; btn.classList.add('selected'); }
+    else { if(selectedRight) selectedRight.classList.remove('selected'); selectedRight=btn; btn.classList.add('selected'); }
+    if(selectedLeft && selectedRight){
+      const isMatch = selectedLeft.dataset.correct === selectedRight.dataset.value;
+      if(isMatch){
+        selectedLeft.classList.remove('selected'); selectedRight.classList.remove('selected');
+        selectedLeft.classList.add('matched'); selectedRight.classList.add('matched');
+        matchedCount++;
+        if(matchedCount===matchWords.length){ resultEl.textContent='🎉 All matched! Great job.'; resultEl.className='msg good'; }
+      } else {
+        [selectedLeft,selectedRight].forEach(b=>{ b.classList.add('shake'); setTimeout(()=>b.classList.remove('shake','selected'),320); });
+      }
+      selectedLeft=null; selectedRight=null;
+    }
+  }
+  matchWords.forEach(([wrong,correct])=>{
+    const btn=document.createElement('button'); btn.className='spell-match-btn'; btn.type='button';
+    btn.textContent=wrong; btn.dataset.correct=correct;
+    btn.addEventListener('click', ()=>handlePick(btn,'left'));
+    leftEl.appendChild(btn);
+  });
+  rightOrder.forEach(([wrong,correct])=>{
+    const btn=document.createElement('button'); btn.className='spell-match-btn'; btn.type='button';
+    btn.textContent=correct; btn.dataset.value=correct;
+    btn.addEventListener('click', ()=>handlePick(btn,'right'));
+    rightEl.appendChild(btn);
+  });
+}
+
+function buildSpellSwitcher(){
+  const row = document.getElementById('spell-switch'); row.innerHTML='';
+  const labels = ['🏖️ Beach Day','🌳 Park Trip','🍞 Baking Day'];
+  labels.forEach((lab,i)=>{
+    const btn=document.createElement('button'); btn.type='button';
+    btn.className = 'spell-switch-btn'+(i===0?' active':'');
+    btn.textContent = lab;
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.spell-switch-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      for(let j=0;j<3;j++){ document.getElementById('spell-panel-'+j).classList.toggle('hidden', j!==i); }
+    });
+    row.appendChild(btn);
+  });
+}
+buildSpellSwitcher();
+
+let spellChecked = new Set();
+function markSpellChecked(storyIdx){
+  spellChecked.add(storyIdx);
+  if(spellChecked.size>=3) unlockContinue();
+}
+
+const spellMisspelled0 = buildSpellFindActivity('spell-story-0','spell-tally-0', SPELL_STORY1_PARTS);
+buildSpellFixActivity('spell-fixlist-0','spell-check-0','spell-result-0', spellMisspelled0, 10, ()=>markSpellChecked(0));
+buildSpellSentences('spell-sentences', spellMisspelled0.slice(0,5).map(w=>w[1]));
+buildSpellMatch('spell-match-left','spell-match-right','spell-match-result', spellMisspelled0.slice(0,8));
+
+const spellMisspelled1 = buildSpellFindActivity('spell-story-1','spell-tally-1', SPELL_STORY2_PARTS);
+buildSpellFixActivity('spell-fixlist-1','spell-check-1','spell-result-1', spellMisspelled1, 10, ()=>markSpellChecked(1));
+
+const spellMisspelled2 = buildSpellFindActivity('spell-story-2','spell-tally-2', SPELL_STORY3_PARTS);
+buildSpellFixActivity('spell-fixlist-2','spell-check-2','spell-result-2', spellMisspelled2, 10, ()=>markSpellChecked(2));
 
 </script>
 </body>
